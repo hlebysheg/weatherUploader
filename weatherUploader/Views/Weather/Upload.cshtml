@@ -1,0 +1,16 @@
+﻿@using weatherUploader.Models.DTO
+@model WeatherDTO
+@using (Html.BeginForm("Post", "Weather", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div class="form-group md-5">
+        <div for="fileInput" class="text-center">Upload exel file</div>
+        @Html.TextBoxFor(m => m.WeatherFiles, new { @class = "form-control mt-2", id="fileInput", type="file", accept=".xlsx", multiple = "multiple" })
+    </div>
+    <div class="container mt-2">
+        <div class="row">
+            <div class="col text-center">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </div>
+}
