@@ -8,7 +8,9 @@ using NPOI.XSSF.UserModel;
 using System.IO;
 using weatherUploader.Infrastracture.Comon.Enum;
 using weatherUploader.Infrastracture.Service.FileService;
+using weatherUploader.Infrastracture.Service.ValidateFileService;
 using weatherUploader.Models.DTO;
+using weatherUploader.Models.Entity;
 
 namespace weatherUploader.Infrastracture.Service.WeatherParser
 {
@@ -16,9 +18,15 @@ namespace weatherUploader.Infrastracture.Service.WeatherParser
     {
         private readonly IFileService _fsv;
 
-        public WeatherParserWorker(IFileService fsv)
+        private readonly WeatherDbContext _db;
+
+        private readonly IVilidateFileService _vld;
+
+        public WeatherParserWorker(IFileService fsv, WeatherDbContext db, IVilidateFileService validator)
         {
             _fsv = fsv;
+            _db = db;
+            _vld = validator;
         }
         public async Task<ParseStatusEnum> ParseExelFileAsync(WeatherDTO dto)
         {
@@ -29,56 +37,79 @@ namespace weatherUploader.Infrastracture.Service.WeatherParser
                 {
                     return ParseStatusEnum.WrongFormat;
                 }
-                XSSFWorkbook hssfwb;
-                using (FileStream stream = new FileStream(Path.Combine(weatherFile.Path), FileMode.Open, FileAccess.Read))
-                {
-                    hssfwb = new XSSFWorkbook(stream);
-                }
+                XSSFWorkbook? hssfwb = _vld.ValidateFile(weatherFile);//проверка структуры(включает проверку кол-во страниц = 12)
 
-                if (!IsValidConstruction(hssfwb))
+                if(hssfwb == null)
                 {
+                    _fsv.delete(weatherFile.Path);//Удаляет неверный файл
                     return ParseStatusEnum.WrongExelStructure;
                 }
-                //старт парсинга
+
+                List<WeatherForecast> weathers = new List<WeatherForecast>();
+
                 for (int i = 0; i < 12; i++)
                 {
                     //проверка на наличие основных параметров в таблице
-                    var sheet = hssfwb.GetSheetAt(i);
-                    var date = sheet.GetRow(4).ToList();//start from 4 row and end where data = ""
+                    for(int j = 4; ; j++)
+                    {
+                        var sheet = hssfwb.GetSheetAt(i);
+                        var row = sheet.GetRow(j)?.ToArray();
+                        if(row == null)
+                        {
+                            break;
+                        }
+
+                        DateTime dt;
+                        bool isCorrectDate = DateTime.TryParse(row[0].ToString()+ " " + row[1].ToString(), out dt);
+                        if (!isCorrectDate)
+                        {
+                            return ParseStatusEnum.DateFormatError;
+                        }
+
+                        try
+                        {
+                            weathers.Add(WeatherForecastFromArray(row, weatherFile));
+                        }
+                        catch (Exception ex)
+                        {
+                            return ParseStatusEnum.WrongExelStructure;
+                        }
+                    }
+                    //start from 4 row and end where data = ""
                 }
+                await _db.WheatherForecast.AddRangeAsync(weathers);//weathers
+            }
+            try
+            {
+                await _db.SaveChangesAsync();
+            }
+            catch
+            {
+                return ParseStatusEnum.SaveChangeError;
             }
             return ParseStatusEnum.Succes;
         }
 
-        private bool IsValidConstruction(XSSFWorkbook hssfwb)
+        private WeatherForecast WeatherForecastFromArray(ICell[] row, WeatherFileInfo? info)
         {
-            if (hssfwb.NumberOfSheets != 12) 
+            var length = row.Count();
+
+            return new WeatherForecast
             {
-                return false;
-            }
-
-            for (int i = 0; i < 12; i++)
-            {
-                //проверка на наличие основных параметров в таблице
-                var sheet = hssfwb.GetSheetAt(i);
-                bool correctDate = GetCell(sheet, "A3").StringCellValue == "Дата";
-                bool correctTime = GetCell(sheet, "B3").StringCellValue == "Время";
-                bool correctTemp = GetCell(sheet, "C3").StringCellValue == "Т";
-
-                if(!correctDate || !correctTime || !correctTemp)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        private ICell GetCell(ISheet sheet, string adr)
-        {
-            var cr = new CellReference(adr);
-            var row = sheet.GetRow(cr.Row);
-            return row.GetCell(cr.Col);
+                Date = DateTime.Parse(row[0].ToString()).Date,
+                TimeMSC = row[1].ToString(),
+                T = row[2].NumericCellValue,
+                Humidity = row[3].NumericCellValue,
+                Td = row[4].NumericCellValue,
+                Pressure = row[5].NumericCellValue,
+                WindDirection = row[6].StringCellValue,
+                WindSpeed = row[7].CellType == NPOI.SS.UserModel.CellType.Numeric ? row[7].NumericCellValue : null,
+                Сloudiness = row[8].CellType == NPOI.SS.UserModel.CellType.Numeric ? row[8].NumericCellValue : null,
+                H = row[9].CellType == NPOI.SS.UserModel.CellType.Numeric ? row[9].NumericCellValue : null,
+                VV = row[10].CellType == NPOI.SS.UserModel.CellType.Numeric ? row[10].NumericCellValue : null,
+                WeatherConditions = length > 11 ? row[11].StringCellValue : null,
+                FileInfo = info,
+            };
         }
     }
 }

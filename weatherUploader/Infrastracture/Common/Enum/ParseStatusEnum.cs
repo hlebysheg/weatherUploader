@@ -15,5 +15,8 @@ namespace weatherUploader.Infrastracture.Comon.Enum
 
         [Description("Неверный формат даты в файле")]
         DateFormatError,
+
+        [Description("Ошибка сохранения в бд")]
+        SaveChangeError,
     }
 }

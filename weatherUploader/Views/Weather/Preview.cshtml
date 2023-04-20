@@ -1,8 +1,152 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@using weatherUploader.Models.DTO
+@using weatherUploader.Models.Entity
+@using weatherUploader.Views.helper
+@using PagedList.Mvc
+@using PagedList
+@model TableDTO
+
 <div>
-    <h4>Preview</h4>
+	<form class="mb-1" method="get" class="text-center">
+		<div class="row">
+			<div class="col">
+				<label for="year">Year</label>
+				<input name="year" id="year" class="form-control text-center" />
+			</div>
+			<div class="col">
+				<label for="mounth">Mounth</label>
+				<select class="form-select text-center" aria-label="Default select example" name="mounth" id="mounth">
+					<option value="0">Select value</option>
+					<option value="1">Jan</option>
+					<option value="2">Feb</option>
+					<option value="3">Mar</option>
+					<option value="4">Apr</option>
+					<option value="5">May</option>
+					<option value="6">Jun</option>
+					<option value="7">Jul</option>
+					<option value="8">Aug</option>
+					<option value="9">Sept </option>
+					<option value="10">Oc </option>
+					<option value="11">No </option>
+					<option value="12">De </option>
+				</select>
+			</div>
+			<div class="col">
+				<label for="pageSize">PageSize</label>
+				<select class="form-select text-center" aria-label="Default select example" name="pageSize" id="pageSize">
+					<option value="30">30</option>
+					<option value="50">50</option>
+					<option value="100">100</option>
+				</select>
+			</div>
+			<div class="col align-self-end">
+				<button type="submit" class="btn btn-primary">use Filter</button>
+				<button id="clear" class="btn btn-primary">Clear</button>
+			</div>
+		</div>
+	</form>
+	@{WeatherTable(Model.WeatherForecast);}
+	<div class="btn-group d-flex mx-auto w-50">
+		@for (int i = Model.PageNumber - 5 > 0 ? Model.PageNumber - 5 : 0; i < (Model.PageNumber + 5 < Model.PageTotal ? Model.PageNumber + 5 : Model.PageTotal); i++)
+		{
+			if (i == Model.PageNumber)
+			{
+				<button class="btn btn-default selected btn-primary" value="@i">@i</button>
+			}
+			else
+			{
+				<button class="btn btn-default" value="@i">@i</button>
+			}
+		}
+		@*@PagingHelpers.PageLinks(Model, x => Url.Action("Index",new { page = x}))*@
+	</div>
 </div>
+
+@section scripts
+{
+	<script type="text/javascript">
+		$(".btn-default").click(function () {
+			let pageNumber = $(this).attr("value");
+			let searchParams = new URLSearchParams(window.location.search)
+
+			let isPage = searchParams.has('page');
+			searchParams.set("page", pageNumber)
+
+			document.location = document.location.protocol + document.location.pathname + "?" + searchParams.toString();
+		});
+	</script>
+	<script type="text/javascript">
+		$("#year").datepicker({
+			format: "yyyy",
+			viewMode: "years",
+			minViewMode: "years"
+		});
+	</script>
+	<script type="text/javascript">
+		$(function () {
+			let searchParams = new URLSearchParams(window.location.search)
+			let isYear = searchParams.has('year');
+			let isMounth = searchParams.has('mounth');
+			let isPageSize = searchParams.has('pageSize');
+			if (isMounth) {
+				//$('#year').val(searchParams.get('year'));
+				$('#mounth').val(searchParams.get('mounth'));
+			}
+			if (isYear) {
+				$('#year').val(searchParams.get('year'));
+			}
+			if (isPageSize) {
+				$('#pageSize').val(searchParams.get('pageSize'));
+			}
+		})
+	</script>
+	<script type="text/javascript">
+		$(function () {
+			$.ajaxSetup({ cache: false });
+			$("#clear").click(function (e) {
+				e.preventDefault();
+				location.href = `/Weather/Preview`;
+			});
+		})
+	</script>
+}
+
+@functions {
+	void WeatherTable(IEnumerable<WeatherForecast> weathers)
+	{
+		<table class="table table-bordered mt-5 table-responsive table-hover">
+			<tr>
+				<th>Id</th>
+				<th>Дата </th>
+				<th>Время МСК</th>
+				<th>T</th>
+				<th>Влажность %</th>
+				<th>Td</th>
+				<th>Давление, мм</th>
+				<th>Направление ветра</th>
+				<th>Скорость ветра</th>
+				<th>Облачность</th>
+				<th>h</th>
+				<th>VV</th>
+				<th>Погодные явления</th>
+			</tr>
+			@foreach (var d in weathers)
+			{
+				<tr>
+					<td>@d.Id</td>
+					<td>@d.Date.ToString("dd.MM.yyyy")</td>
+					<td>@d.TimeMSC</td>
+					<td>@d.T</td>
+					<td>@d.Humidity</td>
+					<td>@d.Td</td>
+					<td>@d.Pressure</td>
+					<td>@d.WindDirection</td>
+					<td>@d.WindSpeed</td>
+					<td>@d.Сloudiness</td>
+					<td>@d.H</td>
+					<td>@d.VV</td>
+					<td>@d.WeatherConditions</td>
+				</tr>
+			}
+		</table>
+	}
+}

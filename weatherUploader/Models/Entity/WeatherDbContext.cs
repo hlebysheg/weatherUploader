@@ -9,7 +9,7 @@ namespace weatherUploader.Models.Entity
         {
         }
         
-        public DbSet<WheatherForecast> WheatherForecast { get; set; }
+        public DbSet<WeatherForecast> WheatherForecast { get; set; }
         public DbSet<WeatherFileInfo> WeatherFileInfo { get; set; }
     }
 }

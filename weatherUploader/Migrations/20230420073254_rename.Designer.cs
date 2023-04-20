@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using weatherUploader.Models.Entity;
 
@@ -10,9 +11,11 @@ using weatherUploader.Models.Entity;
 namespace weatherUploader.Migrations
 {
     [DbContext(typeof(WeatherDbContext))]
-    partial class WeatherDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230420073254_rename")]
+    partial class rename
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.5");
@@ -52,8 +55,8 @@ namespace weatherUploader.Migrations
                     b.Property<int>("FileInfoId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<double?>("H")
-                        .HasColumnType("REAL");
+                    b.Property<int?>("H")
+                        .HasColumnType("INTEGER");
 
                     b.Property<double>("Humidity")
                         .HasColumnType("REAL");
@@ -71,8 +74,8 @@ namespace weatherUploader.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<double?>("VV")
-                        .HasColumnType("REAL");
+                    b.Property<int?>("VV")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("WeatherConditions")
                         .HasColumnType("TEXT");
@@ -83,8 +86,8 @@ namespace weatherUploader.Migrations
                     b.Property<double?>("WindSpeed")
                         .HasColumnType("REAL");
 
-                    b.Property<double?>("Сloudiness")
-                        .HasColumnType("REAL");
+                    b.Property<int?>("Сloudiness")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 

@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using NPOI.SS.UserModel;
+using NPOI.SS.Util;
+using NPOI.XSSF.UserModel;
 using System.Reflection;
 using System.Security.Cryptography;
 using weatherUploader.Models.Entity;
@@ -39,7 +42,7 @@ namespace weatherUploader.Infrastracture.Service.FileService
                 Guid.NewGuid().ToString() + file.FileName);
 
             string hash;
-
+            XSSFWorkbook hssfwb;
             using (var md5 = MD5.Create())
             {
                 using (var stream = System.IO.File.Create(filePath))
