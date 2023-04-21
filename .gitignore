@@ -97,7 +97,7 @@ StyleCopReport.xml
 *.pidb
 *.svclog
 *.scc
-
+.xlsx
 # Chutzpah Test files
 _Chutzpah*
 
@@ -361,3 +361,21 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/exel/ffb9f6e9-65d9-4a4d-a2e7-e25d5a63a090moskva_2012.xlsx
+/exel/f82cf51a-3258-48be-8bb9-0419edf6d0b0moskva_2012.xlsx
+/exel/ee5e6c8f-92fa-438c-ba25-4e49a3fc016bmoskva_2013.xlsx
+/exel/e91e7daf-de8d-4d0b-8b11-9c69fe149f83moskva_2012.xlsx
+/exel/e88d4257-9412-4a6e-b9e8-443858ded2bamoskva_2012.xlsx
+/exel/db97dc72-2e0d-4178-a73d-448e605806a6moskva_2012.xlsx
+/exel/973a0b95-c33c-4e59-90d0-6c237e2e2582moskva_2012.xlsx
+/exel/8919c0dc-3514-44a8-b008-21b9882feba3moskva_2012.xlsx
+/exel/7f7b366b-5021-4367-a569-21322e8b1131moskva_2012.xlsx
+/exel/7d97261d-344b-4f07-ad29-ca56b93c6c97moskva_2012.xlsx
+/exel/7bdc4773-9b2c-421b-9018-913fcf1bd2c2moskva_2013.xlsx
+/exel/7b555e75-2ab7-4e32-86b2-b281c3e1186emoskva_2012.xlsx
+/exel/792a9d02-9d5e-4dd3-ac03-96a67080d367moskva_2012.xlsx
+/exel/76974939-a5cd-4cfa-b567-612a714b8710moskva_2012.xlsx
+/exel/566f146a-b182-466c-9380-e6fe5c9ee58dmoskva_2013.xlsx
+/exel/4a2da2b5-3cd7-47f4-93e0-6391bf08f0a4moskva_2012.xlsx
+/exel/2c6ec886-16aa-43f7-a1e3-3d5fb5154072moskva_2012.xlsx
+/exel/194b9775-e571-4b1b-b107-265b369afbb6moskva_2012.xlsx
