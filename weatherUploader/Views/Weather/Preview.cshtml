@@ -112,6 +112,13 @@
 @functions {
 	void WeatherTable(IEnumerable<WeatherForecast> weathers)
 	{
+		@if(weathers.Count() == 0)
+		{
+			<div>
+				<h4 class="text-center mt-5">No one forecasts ((</h4>
+			</div>
+			return;
+		}
 		<table class="table table-bordered mt-5 table-responsive table-hover">
 			<tr>
 				<th>Id</th>

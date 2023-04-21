@@ -16,13 +16,13 @@ services:
     ports:
       - "5432"
     restart: always
-    #volumes:
-    #  - db_volume:/var/lib/postgresql/data
-    #  - ./dbscripts/seed.sql :/docker-entrypoint-initdb.d/seed.sql
+    volumes:
+      - db:/var/lib/postgresql/data
     environment:
       PGPORT: 5432
       POSTGRES_USER: "authuser"
       POSTGRES_PASSWORD: "auth"
       POSTGRES_DB: "auth"
 volumes:
-  static:
+   db:
+    driver: local  

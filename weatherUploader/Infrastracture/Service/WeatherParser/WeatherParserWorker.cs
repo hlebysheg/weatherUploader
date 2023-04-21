@@ -114,7 +114,7 @@ namespace weatherUploader.Infrastracture.Service.WeatherParser
 
             return new WeatherForecast
             {
-                Date = DateTime.ParseExact(row[0].ToString(), "dd.MM.yyyy", CultureInfo.InvariantCulture).ToUniversalTime(),
+                Date = DateTime.ParseExact(row[0].ToString(), "dd.MM.yyyy", CultureInfo.InvariantCulture).ToUniversalTime(),//pg error wihout non utc time
                 TimeMSC = row[1].ToString(),
                 T = row[2].NumericCellValue,
                 Humidity = row[3].NumericCellValue,
