@@ -15,7 +15,13 @@ namespace weatherUploader.Infrastracture.Service.WeatherService
 		}
 		public async Task<TableDTO> GetWeatherByFilter(WeatherFilter filter)
 		{
-			var source = _db.WheatherForecast;
+			bool isYear = filter.Year != null;
+			bool isMounth = filter.Mounth != null;
+			//todo add specification pattern
+			var source = _db.WheatherForecast.Where(el =>
+														(isYear? el.Date.Year == filter.Year: true )
+														&& (isMounth? el.Date.Month == filter.Mounth: true));
+
 			var weather = await source
 									.Skip(filter.Page * filter.PageSize)
 									.Take(filter.PageSize)

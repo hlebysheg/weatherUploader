@@ -24,24 +24,20 @@ namespace weatherUploader.Infrastracture.Service.ValidateFileService
             {
                 //проверка на наличие основных параметров в таблице
                 var sheet = hssfwb.GetSheetAt(i);
-                bool correctDate = GetCell(sheet, "A3").StringCellValue == "Дата";
-                bool correctTime = GetCell(sheet, "B3").StringCellValue == "Время";
-                bool correctTemp = GetCell(sheet, "C3").StringCellValue == "Т";
+                var cells = sheet.GetRow(2).Cells;
 
-                if (!correctDate || !correctTime || !correctTemp)
+                bool correctDate = cells[0].StringCellValue == "Дата";
+                bool correctTime = cells[1].StringCellValue == "Время";
+                bool correctTemp = cells[2].StringCellValue == "Т";
+				bool correctPercent = cells[3].StringCellValue == "Отн. влажность";
+
+				if (!correctDate || !correctTime || !correctTemp || !correctPercent)
                 {
                     return null;
                 }
             }
 
             return hssfwb;
-        }
-
-        private ICell GetCell(ISheet sheet, string adr)
-        {
-            var cr = new CellReference(adr);
-            var row = sheet.GetRow(cr.Row);
-            return row.GetCell(cr.Col);
         }
     }
 }

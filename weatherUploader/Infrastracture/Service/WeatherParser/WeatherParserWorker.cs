@@ -6,6 +6,7 @@ using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using NPOI.XSSF.UserModel;
 using System.IO;
+using weatherUploader.Infrastracture.Common.Data;
 using weatherUploader.Infrastracture.Comon.Enum;
 using weatherUploader.Infrastracture.Service.FileService;
 using weatherUploader.Infrastracture.Service.ValidateFileService;
@@ -45,39 +46,14 @@ namespace weatherUploader.Infrastracture.Service.WeatherParser
                     return ParseStatusEnum.WrongExelStructure;
                 }
 
-                List<WeatherForecast> weathers = new List<WeatherForecast>();
+                List<WeatherForecast>? weathers = ParseFile(hssfwb, weatherFile);
 
-                for (int i = 0; i < 12; i++)
+                if(weathers == null)
                 {
-                    //проверка на наличие основных параметров в таблице
-                    for(int j = 4; ; j++)
-                    {
-                        var sheet = hssfwb.GetSheetAt(i);
-                        var row = sheet.GetRow(j)?.ToArray();
-                        if(row == null)
-                        {
-                            break;
-                        }
-
-                        DateTime dt;
-                        bool isCorrectDate = DateTime.TryParse(row[0].ToString()+ " " + row[1].ToString(), out dt);
-                        if (!isCorrectDate)
-                        {
-                            return ParseStatusEnum.DateFormatError;
-                        }
-
-                        try
-                        {
-                            weathers.Add(WeatherForecastFromArray(row, weatherFile));
-                        }
-                        catch (Exception ex)
-                        {
-                            return ParseStatusEnum.WrongExelStructure;
-                        }
-                    }
-                    //start from 4 row and end where data = ""
+                    return ParseStatusEnum.DateFormatError;
                 }
-                await _db.WheatherForecast.AddRangeAsync(weathers);//weathers
+
+				await _db.WheatherForecast.AddRangeAsync(weathers);//weathers
             }
             try
             {
@@ -89,7 +65,41 @@ namespace weatherUploader.Infrastracture.Service.WeatherParser
             }
             return ParseStatusEnum.Succes;
         }
+        private List<WeatherForecast> ParseFile(XSSFWorkbook? hssfwb, WeatherFileInfo weatherFile)
+        {
+			List<WeatherForecast> weathers = new List<WeatherForecast>();
 
+			for (int i = 0; i < hssfwb.NumberOfSheets; i++)
+			{
+				for (int j = 4; ; j++)//значения начинаются с 4-го ряда
+				{
+					var sheet = hssfwb.GetSheetAt(i);
+					var row = sheet.GetRow(j)?.ToArray();
+					if (row == null)
+					{
+						break;
+					}
+
+					DateTime dt;
+					bool isCorrectDate = DateTime.TryParse(row[0].ToString() + " " + row[1].ToString(), out dt);
+					if (!isCorrectDate)
+					{
+						return null; //первая + вторая колонка дают дату в формате dd.mm.yyyy hh:mm
+					}
+
+					try
+					{
+						weathers.Add(WeatherForecastFromArray(row, weatherFile));
+					}
+					catch (Exception ex)
+					{
+						return null;
+					}
+				}
+			}
+
+            return weathers;
+		}
         private WeatherForecast WeatherForecastFromArray(ICell[] row, WeatherFileInfo? info)
         {
             var length = row.Count();

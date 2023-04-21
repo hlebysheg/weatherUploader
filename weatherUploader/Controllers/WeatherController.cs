@@ -46,8 +46,14 @@ namespace weatherUploader.Controllers
         public async Task<IActionResult> PostAsync([FromForm] WeatherDTO WeatherFiles)
         {
             var response = await _parser.ParseExelFileAsync(WeatherFiles);
-            return Ok();
-        }
+            if(response != ParseStatusEnum.Succes)
+            {
+				TempData["ErrorMessage"] = response.GetDescription();
+				return RedirectToAction(nameof(Upload));
+			}
+            TempData["SuccesMessage"] = response.GetDescription();
+			return RedirectToAction(nameof(Upload));
+		}
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

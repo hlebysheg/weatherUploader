@@ -1,10 +1,19 @@
 ﻿@using weatherUploader.Models.DTO
 @model WeatherDTO
+@if (TempData["ErrorMessage"] != null)
+{
+   
+    <div class="alert alert-danger" role="alert"><b>@TempData["ErrorMessage"]</b><br /></div>
+}
+@if (TempData["SuccesMessage"] != null)
+{
+    <div class="alert alert-success" role="alert"><b>@TempData["SuccesMessage"]</b><br /></div>
+}
 @using (Html.BeginForm("Post", "Weather", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     <div class="form-group md-5">
         <div for="fileInput" class="text-center">Upload exel file</div>
-        @Html.TextBoxFor(m => m.WeatherFiles, new { @class = "form-control mt-2", id="fileInput", type="file", accept=".xlsx", multiple = "multiple" })
+        @Html.TextBoxFor(m => m.WeatherFiles, new { @class = "form-control mt-2", id="fileInput", type="file", accept=".xlsx", multiple = "multiple", required="true" })
     </div>
     <div class="container mt-2">
         <div class="row">
@@ -13,4 +22,15 @@
             </div>
         </div>
     </div>
+}
+@section scripts
+{
+    <script>
+        $(function () {
+            setTimeout(function () {
+                $(".alert-danger").fadeOut('slow');
+                $(".alert-success").fadeOut('slow');
+            }, 6000);
+        });
+    </script>
 }
