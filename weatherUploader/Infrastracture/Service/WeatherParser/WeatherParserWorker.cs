@@ -5,6 +5,7 @@ using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using NPOI.XSSF.UserModel;
+using System.Globalization;
 using System.IO;
 using weatherUploader.Infrastracture.Common.Data;
 using weatherUploader.Infrastracture.Comon.Enum;
@@ -59,7 +60,7 @@ namespace weatherUploader.Infrastracture.Service.WeatherParser
             {
                 await _db.SaveChangesAsync();
             }
-            catch
+            catch(Exception ex)
             {
                 return ParseStatusEnum.SaveChangeError;
             }
@@ -81,8 +82,15 @@ namespace weatherUploader.Infrastracture.Service.WeatherParser
 					}
 
 					DateTime dt;
-					bool isCorrectDate = DateTime.TryParse(row[0].ToString() + " " + row[1].ToString(), out dt);
-					if (!isCorrectDate)
+                    string dateString = row[0].ToString() + " " + row[1].ToString();
+
+                    bool isCorrectDate = DateTime.TryParseExact(dateString,
+                                                                   "dd.MM.yyyy HH:mm",
+                                                                   CultureInfo.InvariantCulture,
+                                                                   DateTimeStyles.None,
+                                                                   out dt);
+
+                    if (!isCorrectDate)
 					{
 						return null; //первая + вторая колонка дают дату в формате dd.mm.yyyy hh:mm
 					}
@@ -106,7 +114,7 @@ namespace weatherUploader.Infrastracture.Service.WeatherParser
 
             return new WeatherForecast
             {
-                Date = DateTime.Parse(row[0].ToString()).Date,
+                Date = DateTime.ParseExact(row[0].ToString(), "dd.MM.yyyy", CultureInfo.InvariantCulture).ToUniversalTime(),
                 TimeMSC = row[1].ToString(),
                 T = row[2].NumericCellValue,
                 Humidity = row[3].NumericCellValue,

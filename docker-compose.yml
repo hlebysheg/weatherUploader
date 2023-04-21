@@ -1,0 +1,28 @@
+version: '3.4'
+
+services:
+  weatheruploader:
+    image: ${DOCKER_REGISTRY-}weatheruploader
+    build:
+      context: .
+      dockerfile: weatherUploader/Dockerfile
+    depends_on:
+      - postgres_image
+    volumes:
+      - ./exel:/static
+
+  postgres_image:
+    image: postgres:latest
+    ports:
+      - "5432"
+    restart: always
+    #volumes:
+    #  - db_volume:/var/lib/postgresql/data
+    #  - ./dbscripts/seed.sql :/docker-entrypoint-initdb.d/seed.sql
+    environment:
+      PGPORT: 5432
+      POSTGRES_USER: "authuser"
+      POSTGRES_PASSWORD: "auth"
+      POSTGRES_DB: "auth"
+volumes:
+  static:
